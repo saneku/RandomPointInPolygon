@@ -1,0 +1,11 @@
+set term png
+set output "points.png"
+set nokey
+set size ratio 1
+set timestamp
+set xlabel "<---X--->"
+set ylabel "<---Y--->"
+set title "points"
+set grid
+
+plot 'points.dat' using 1:2 with points pt 7 ps 0.2 lc rgb "black"
