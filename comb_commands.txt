@@ -4,7 +4,7 @@
 #  gnuplot < comb_commands.txt
 #
 set term png
-set output "comb.png"
+set output "./POINTS/comb.png"
 set nokey
 set size ratio 1
 set timestamp
@@ -16,4 +16,4 @@ set style data lines
 plot "comb_edges.txt" using 1:2 lw 3 linecolor rgb "green",\
      "comb_diagonals.txt" using 1:2 lw 3 linecolor rgb "red",\
      "comb_nodes.txt" using 1:2 with points pt 7 ps 2 lc rgb "black",\
-     "points.dat" using 1:2 with points pt 1 ps 0.2 lc rgb "black"
+     "./POINTS/comb_nodes.txt" using 1:2 with points pt 1 ps 0.2 lc rgb "black"

@@ -4,11 +4,12 @@ CFLAGS=-c -g -Og -Wall
 
 # linking
 a.out: poltrian.o
-	$(FC) poltrian.o polygon_triangulate_test.o
+	$(FC) poltrian.o list_files.o
+	clean
 
 # compiling
 poltrian.o: poltrian.f90
-	$(FC) $(CFLAGS) poltrian.f90 polygon_triangulate_test.f90
+	$(FC) $(CFLAGS) poltrian.f90 list_files.f90
 
 # cleanup
 clean:
@@ -17,4 +18,3 @@ clean:
 # run
 run:
 	make
-	./a.out

@@ -1,3 +1,5 @@
 *.o
 *.png
 a.out
+POINTS
+.DS_Store

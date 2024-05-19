@@ -2,7 +2,7 @@ program main
   implicit none
   !gfortran poltrian.f90 polygon_triangulate_test.f90
   integer ( kind = 4 ), parameter :: n = 10
-  integer ( kind = 4 ), parameter :: number_of_random_points = 20000
+  integer ( kind = 4 ), parameter :: number_of_random_points = 200000
 
   integer ( kind = 4 ) triangles(3,n-2)
 
@@ -25,10 +25,6 @@ program main
   !call my_polygon_triangulate ( n, x, y, triangles,triangles_areas )
   !print *, triangles_areas
   !print *, sum(triangles_areas)
-   triangles=0
-   xr=0
-   yr=0
-
 
    call polygon_triangulate ( n, x, y, triangles )
 
@@ -52,7 +48,7 @@ program main
                                   x(triangles(3,t)),y(triangles(3,t)))
       print *,tr_area
 
-      number_of_points_per_triangle = (number_of_random_points*(tr_area/whole_area))
+      number_of_points_per_triangle = int(number_of_random_points*(tr_area/whole_area))
       print *,number_of_points_per_triangle
 
       call randUnifTriangle(x(triangles(1,t)),y(triangles(1,t)), &

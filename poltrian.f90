@@ -1043,6 +1043,94 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
   
     return
   end
+
+
+  subroutine my_r8mat_write ( output_filename, m, n, table )
+  
+    !*****************************************************************************80
+    !
+    !! I4MAT_WRITE writes an I4MAT file.
+    !
+    !  Discussion:
+    !
+    !    An I4MAT is an array of I4's.
+    !
+    !  Licensing:
+    !
+    !    This code is distributed under the GNU LGPL license.
+    !
+    !  Modified:
+    !
+    !    31 August 2009
+    !
+    !  Author:
+    !
+    !    John Burkardt
+    !
+    !  Parameters:
+    !
+    !    Input, character ( len = * ) OUTPUT_FILENAME, the output file name.
+    !
+    !    Input, integer ( kind = 4 ) M, the spatial dimension.
+    !
+    !    Input, integer ( kind = 4 ) N, the number of points.
+    !
+    !    Input, integer ( kind = 4 ) TABLE(M,N), the data.
+    !
+      implicit none
+    
+      integer ( kind = 4 ) m
+      integer ( kind = 4 ) n
+    
+      integer ( kind = 4 ) j,k
+      character ( len = * ) output_filename
+      integer ( kind = 4 ) output_status
+      integer ( kind = 4 ) output_unit
+      !character ( len = 30 ) string
+      real ( kind = 8 ) table(m,n)
+    !
+    !  Open the file.
+    !
+      call get_unit ( output_unit )
+    
+      open ( unit = output_unit, file = output_filename, &
+        status = 'replace', iostat = output_status )
+    
+      if ( output_status /= 0 ) then
+        write ( *, '(a)' ) ' '
+        write ( *, '(a)' ) 'I4MAT_WRITE - Fatal error!'
+        write ( *, '(a,i8)' ) '  Could not open the output file "' // &
+          trim ( output_filename ) // '" on unit ', output_unit
+        output_unit = -1
+        stop 1
+      end if
+    !
+    !  Create a format string.
+    !
+      if ( 0 < m .and. 0 < n ) then
+    
+        !write ( string, '(a1,i8,a4)' ) '(', m, 'i10)'
+    !
+    !  Write the data.
+    !
+        !do j = 1, n
+        !  write ( output_unit, string ) table(1:m,j)
+        !end do
+
+        do j = 1, n
+          write(output_unit, *) (table(k,j), k = 1, size(table, 1))
+        end do
+
+    
+      end if
+    !
+    !  Close the file.
+    !
+      close ( unit = output_unit )
+    
+      return
+    end
+
   function in_cone ( im1, ip1, n, prev_node, next_node, x, y )
   
   !*****************************************************************************80
@@ -1388,44 +1476,8 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
     return
   end
 
-  subroutine randUnifTriangle ( x1, y1, x2, y2, x3, y3,n,xr,yr)
-    implicit none
+
   
-    integer ( kind = 4 ) n !number_of_random_points
-  
-    real ( kind = 8 ) xr(n),yr(n)
-
-    real ( kind = 8 ) x1,x2,x3
-    real ( kind = 8 ) y1,y2,y3
-    real ( kind = 8 ) ax,ay,bx,by
-    integer ( kind = 4 ) i
-    real :: u1,u2
-
-    !a and b are vectors at the origin
-    ax = x2-x1
-    ay = y2-y1
-
-    bx = x3-x1
-    by = y3-y1
-
-    i=0
-    do while ( i < n )
-      call random_number(u1)
-      call random_number(u2)
-
-      if (u1+u2 >= 1.0 ) then
-        u1 = 1 - u1
-        u2 = 1 - u2
-      end if
-      
-      xr(i)=u1*ax+u2*bx+x1
-      yr(i)=u1*ay+u2*by+y1
-
-      i=i+1
-    end do 
-
-    return
-  end
 
   subroutine polygon_triangulate ( n, x, y, triangles )
 
@@ -1486,7 +1538,6 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
       real ( kind = 8 ) area
       logical ( kind = 4 ) diagonal
       logical ( kind = 4 ) ear(n)
-      integer ( kind = 4 ) first
       integer ( kind = 4 ) i
       integer ( kind = 4 ) i0
       integer ( kind = 4 ) i1
