@@ -20,46 +20,48 @@ program read_files_in_folder
 
     integer, parameter :: max_number_of_polys = 10
     integer, parameter :: max_number_of_triangles_per_poly = 100    
+    character(len=256), dimension(max_number_of_polys) :: poly_list
     real ( kind = 8 ), dimension(max_number_of_polys) :: polys_area
     integer ( kind = 4 ), dimension(max_number_of_polys) :: tris_counter
     type(triangle), dimension(max_number_of_polys,max_number_of_triangles_per_poly) :: tris
     real ( kind = 8 ), dimension(max_number_of_polys,max_number_of_triangles_per_poly) :: tris_areas
 
+    !this for random points
+    integer ( kind = 4 ), parameter :: number_of_points_per_poly = 20000
+    integer ( kind = 4 ) number_of_points_per_triangle,offset
+    real ( kind = 8 ), allocatable :: rp(:,:)
 
-    !integer ( kind = 4 ), parameter :: number_of_points_per_poly = 2000
-    !integer ( kind = 4 ) number_of_points_per_triangle
-    !integer ( kind = 4 ) triangle_num
-    !real ( kind = 8 ) tr_area
-    !real ( kind = 8 ), allocatable :: rp(:,:)
+    call initPolygons(num_polys,poly_list)
 
-    
-
-    call initPolygons(num_polys)
-  
-    
+    !test
     do i = 1, num_polys
-        do t = 1, tris_counter(i)
-          print *,tris_areas(i,t)
-        end do 
-        print *,"\n"
+      do t = 1, tris_counter(i)
+        print *,tris_areas(i,t)
+      end do 
+      print *,"\n"
     end do
+  
+    do i = 1, num_polys
+      offset = 1 
+      allocate ( rp(2,number_of_points_per_poly))
+      do t = 1, tris_counter(i)
+        number_of_points_per_triangle = int(number_of_points_per_poly*(tris_areas(i,t)/polys_area(i)))
+        
+        call randUnifTriangle(tris(i,t)%x1,tris(i,t)%y1, &
+                              tris(i,t)%x2,tris(i,t)%y2, &
+                              tris(i,t)%x3,tris(i,t)%y3, &
+                              number_of_points_per_triangle,rp,offset)
 
+        offset = offset + number_of_points_per_triangle
+      end do 
 
-!allocate ( rp(2,number_of_points_per_poly))
-!offset = 1  ! Starting offset   
-!number_of_points_per_triangle = int(number_of_points_per_poly*(tr_area/polys_area(i)))
-!print *,tr_area,number_of_points_per_triangle
+      !print *,offset
+      call my_r8mat_write (  "POINTS/" // poly_list(i), 2, offset, rp )
 
-!call randUnifTriangle(xy(1,triangles(1,t)),xy(2,triangles(1,t)), &
-!                      xy(1,triangles(2,t)),xy(2,triangles(2,t)), &
-!                      xy(1,triangles(3,t)),xy(2,triangles(3,t)), &
-!                        number_of_points_per_triangle,rp,offset)
-!offset = offset + number_of_points_per_triangle
-!print *,offset
-!call my_r8mat_write (  "POINTS/" // poly_list(i), 2, offset, rp )
-!    deallocate ( rp )
+      deallocate ( rp )
 
-
+    end do
+    
 
 
     contains
@@ -112,9 +114,9 @@ program read_files_in_folder
         integer :: ios
 
         ! Step 1: Get the list of files using a system command
-        call execute_command_line("ls -1 POLYGONS > file_list.txt", wait=.true.)
+        call execute_command_line("ls -1 POLYGONS > polygon_list.txt", wait=.true.)
         ! Step 2: Read the list of files into an array
-        open(unit=10, file='file_list.txt', status='old', action='read')
+        open(unit=10, file='polygon_list.txt', status='old', action='read')
         num_files = 0
         do
             read(10, '(A)', iostat=ios) filename
@@ -129,30 +131,30 @@ program read_files_in_folder
         end do
         close(10)
         ! Step 3: Remove file_list.txt from the disk
-        call execute_command_line("rm file_list.txt", wait=.true.)
+        call execute_command_line("rm polygon_list.txt", wait=.true.)
     end subroutine getNumberOfPolygons
 
 
-    subroutine initPolygons(lnum_polys)
+    subroutine initPolygons(lnum_polys,lpoly_list)
       implicit none
       integer, intent(in):: lnum_polys
+      character(len=256), intent(inout) :: lpoly_list(:)
       integer :: li,lt
       real ( kind = 8 ) polygon_area,triangle_area
       integer ( kind = 4 ) dim_num!,offset
-      integer ( kind = 4 ) num_nodes
-      character(len=256), dimension(max_number_of_polys) :: poly_list
+      integer ( kind = 4 ) num_nodes      
       
       integer ( kind = 4 ), allocatable :: triangles(:,:)
       real ( kind = 8 ), allocatable :: xy(:,:)
       
-      call getNumberOfPolygons(num_polys,poly_list,max_number_of_polys)
+      call getNumberOfPolygons(num_polys,lpoly_list,max_number_of_polys)
       print *, 'Found ',num_polys, ' polygons'
       do li = 1, lnum_polys
-        print *, 'Reading file:', trim(poly_list(li))
+        print *, 'Reading file:', trim(lpoly_list(li))
 
-        call read_file_header ( "POLYGONS/" // poly_list(li), dim_num, num_nodes )
+        call read_file_header ( "POLYGONS/" // lpoly_list(li), dim_num, num_nodes )
         allocate ( xy(2,num_nodes) )
-        call read_data_from_file ( "POLYGONS/" // poly_list(li), 2, num_nodes, xy )
+        call read_data_from_file ( "POLYGONS/" // lpoly_list(li), 2, num_nodes, xy )
         
         polys_area(li) = polygon_area ( num_nodes, xy(1,:), xy(2,:) )
 
@@ -173,10 +175,6 @@ program read_files_in_folder
             tris(li,lt)%x1 = xy(1,triangles(1,lt)); tris(li,lt)%y1 = xy(2,triangles(1,lt))
             tris(li,lt)%x2 = xy(1,triangles(2,lt)); tris(li,lt)%y2 = xy(2,triangles(2,lt))
             tris(li,lt)%x3 = xy(1,triangles(3,lt)); tris(li,lt)%y3 = xy(2,triangles(3,lt))
-
-            !tris_areas(i,t) = triangle_area ( xy(1,triangles(1,t)),xy(2,triangles(1,t)), &
-            !                                  xy(1,triangles(2,t)),xy(2,triangles(2,t)), &
-             !                                 xy(1,triangles(3,t)),xy(2,triangles(3,t)))
 
             tris_areas(li,lt) = triangle_area ( tris(li,lt)%x1,tris(li,lt)%y1, &
                                               tris(li,lt)%x2,tris(li,lt)%y2, &
