@@ -11,9 +11,9 @@ program read_files_in_folder
     ! Declarations
     character(len=256) :: filename
     integer :: i, ios
-    integer, parameter :: max_files = 100
+    integer, parameter :: max_number_of_polys = 100
     integer ( kind = 4 ), parameter :: number_of_points_per_poly = 2000
-    character(len=256), dimension(max_files) :: file_list
+    character(len=256), dimension(max_number_of_polys) :: file_list
     integer :: num_files
 
 
@@ -45,9 +45,9 @@ program read_files_in_folder
     do i = 1, num_files
         print *, 'Reading file:', trim(file_list(i))
 
-        call r8mat_header_read ( "POLYGONS/" // file_list(i), dim_num, n )
+        call read_file_header ( "POLYGONS/" // file_list(i), dim_num, n )
         allocate ( xy(1:2,1:n) )
-        call r8mat_data_read ( "POLYGONS/" // file_list(i), 2, n, xy )
+        call read_data_from_file ( "POLYGONS/" // file_list(i), 2, n, xy )
         
         poly_whole_area = polygon_area ( n, xy(1,:), xy(2,:) )
         print *,poly_whole_area

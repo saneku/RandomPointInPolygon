@@ -1919,7 +1919,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
 
     return
   end
-  subroutine r8mat_data_read ( input_filename, m, n, table )
+  subroutine read_data_from_file ( input_filename, m, n, table )
   
   !*****************************************************************************80
   !
@@ -1980,7 +1980,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
     if ( input_status /= 0 ) then
       ierror = 1
       write ( *, '(a)' ) ' '
-      write ( *, '(a)' ) 'R8MAT_DATA_READ - Fatal error!'
+      write ( *, '(a)' ) 'read_data_from_file - Fatal error!'
       write ( *, '(a,i8)' ) '  Could not open the input file "' // &
         trim ( input_filename ) // '" on unit ', input_unit
       stop 1
@@ -1994,7 +1994,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
   
       if ( input_status /= 0 ) then
         write ( *, '(a)' ) ' '
-        write ( *, '(a)' ) 'R8MAT_DATA_READ - Fatal error!'
+        write ( *, '(a)' ) 'read_data_from_file - Fatal error!'
         write ( *, '(a)' ) '  Error while reading lines of data.'
         write ( *, '(a,i8)' ) '  Number of values expected per line M = ', m
         write ( *, '(a,i8)' ) '  Number of data lines read, J =         ', j
@@ -2022,7 +2022,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
   
     return
   end
-  subroutine r8mat_header_read ( input_filename, m, n )
+  subroutine read_file_header ( input_filename, m, n )
   
   !*****************************************************************************80
   !
@@ -2062,7 +2062,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
   
     if ( m <= 0 ) then
       write ( *, '(a)' ) ' '
-      write ( *, '(a)' ) 'R8MAT_HEADER_READ - Fatal error!'
+      write ( *, '(a)' ) 'read_file_header - Fatal error!'
       write ( *, '(a)' ) '  There was some kind of I/O problem while trying'
       write ( *, '(a)' ) '  to count the number of data columns in'
       write ( *, '(a)' ) '  the file "' // trim ( input_filename ) // '".'
@@ -2073,7 +2073,7 @@ function angle_degree ( x1, y1, x2, y2, x3, y3 )
   
     if ( n <= 0 ) then
       write ( *, '(a)' ) ' '
-      write ( *, '(a)' ) 'R8MAT_HEADER_READ - Fatal error!'
+      write ( *, '(a)' ) 'read_file_header - Fatal error!'
       write ( *, '(a)' ) '  There was some kind of I/O problem while trying'
       write ( *, '(a)' ) '  to count the number of data rows in'
       write ( *, '(a)' ) '  the file "' // trim ( input_filename ) // '".'
