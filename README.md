@@ -1,5 +1,17 @@
 Generate random points in polygon. coded in fortran.
 
+Compile:
+gfortran poltrian.f90 list_final.f90
+
+Run:
+./a.out
+Random points for 3 polygons will be written in ./POINTS dir.
+
+Plot:
+gnuplot < i18_commands.txt;gnuplot < hand_commands.txt;gnuplot < comb_commands.txt
+will plot png file for each polygon with random points inside.
+
+
 based on:
 https://people.math.sc.edu/Burkardt/f_src/polygon_triangulate/polygon_triangulate.html
 
